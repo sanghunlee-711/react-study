@@ -43,11 +43,50 @@
 
 ///Under is Refactored
 
-import createItemsLogic from "../common/createItemsLogic";
+// import createItemsLogic from "../common/createItemsLogic";
 
-const { add, remove, edit, reducer } = createItemsLogic("friends");
+// const { add, remove, edit, reducer } = createItemsLogic("friends");
+// export const addFriend = add;
+// export const removeFriend = remove;
+// export const editFriend = edit;
+
+// export default reducer;
+
+//Under is Refactored2
+
+import createReducer from "../../common/createReducer";
+import createItemsLogic from "../../common/createItemsLogic";
+import mergeReducer from "../../common/mergeReducer";
+import { MAX_AGE_LIMIT, MAX_SHOW_LIMIT } from ".././common";
+
+const { add, remove, edit, reducer: friendsReducer } = createItemsLogic(
+  "friends"
+);
+
+//연령제한과 갯수제한정보를 처리하는 액션타입
+const SET_AGE_LIMIT = "friend/SET_AGE_LIMIT";
+const SET_SHOW_LIMIT = "friend/SET_SHOW_LIMIT";
+
 export const addFriend = add;
 export const removeFriend = remove;
 export const editFriend = edit;
+//연령제한과 갯수제한정보를 처리하는 액션생성자 함수
+export const setAgeLimit = (ageLimit) => ({ type: SET_AGE_LIMIT, ageLimit });
+export const setShowLimit = (showLimit) => ({
+  type: SET_SHOW_LIMIT,
+  showLimit,
+});
 
-export default reducer;
+//초기값으로는 두 값의 최대값 기입
+const INITIAL_STATE = { ageLimit: MAX_AGE_LIMIT, showLimit: MAX_SHOW_LIMIT };
+
+//연령제한과 갯수제한정보를 처리하는 리듀서 함수 생성
+const reducer = createReducer(INITIAL_STATE, {
+  [SET_AGE_LIMIT]: (state, action) => (state.ageLimit = action.ageLimit),
+  [SET_SHOW_LIMIT]: (state, action) => (state.showLimit = action.showLimit),
+});
+
+const reducers = [reducer, friendsReducer];
+
+// 친구목록을 처리하는 리듀서 함수와 하나로 합친다.
+export default mergeReducer(reducers);
